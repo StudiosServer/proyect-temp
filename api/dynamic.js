@@ -1,119 +1,140 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-const FOLDERS_PATH = path.join(process.cwd(), "folders");
+export default async function handler(req, res) {
+    try {
+        const folderName = req.query.folder;   // /api/dynamic?folder=anime
+        const baseDir = path.join(process.cwd(), "folders", folderName);
 
-// Genera el HTML dinámico
-function generateHTML(folderName, files) {
-  const cleanFolderName =
-    folderName.charAt(0).toUpperCase() + folderName.slice(1);
+        let files;
+        try {
+            files = await fs.readdir(baseDir);
+        } catch (e) {
+            return res.status(404).send("Folder not found");
+        }
 
-  let rows = "";
+        const jsFiles = files.filter(f => f.endsWith(".js"));
 
-  files.forEach((file) => {
-    const cleanName = file.replace(".js", "");
-    const displayName =
-      cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+        const rowsHtml = jsFiles.map(file => {
+            const cleanName = file.replace(".js", "");
+            const displayName =
+                cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 
-    rows += `
-        <tr class="button-false">
-          <td class="ellipsis">
-            <tt><span class="circle color-true"></span>${displayName}</tt>
-          </td>
-          <td align="center">
-            <a href="/${folderName}/${cleanName}">
-              <button class="build-button">Use</button>
-            </a>
-          </td>
-        </tr>
-    `;
-  });
+            return `
+<tr class="button-false">
+   <td class="ellipsis">
+      <tt><span class="circle color-true"></span>${displayName}</tt>
+   </td>
+   <td align="center">
+      <a href="./${cleanName}">
+         <button class="build-button">Use</button>
+      </a>
+   </td>
+</tr>`;
+        }).join("\n");
 
-  return `
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
-<head>
+   <head>
+<script>
+${/* TODA TU ANIMACIÓN */""}
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header');
+            const chars = "!@#<>$%^&*()-_=+[]{}|;:,.<>?\\\`~";
+            const finalText = "${folderName}";
+            const charTime = 50;
+            const revealTime = 50;
+            let glitching = true;
+            const originalText = finalText.split('');
+            const length = originalText.length;
+            const halfLength = Math.ceil(length / 2);
+
+            function getRandomChar() {
+                return chars[Math.floor(Math.random() * chars.length)];
+            }
+
+            function glitchText(element, finalText, charTime, revealTime) {
+                let glitchInterval = setInterval(() => {
+                    let newText = originalText.map((char, i) => {
+                        return glitching && Math.random() > 0.5 ? getRandomChar() : char;
+                    }).join('');
+                    element.innerText = newText;
+                }, charTime);
+
+                setTimeout(() => {
+                    clearInterval(glitchInterval);
+                    glitching = false;
+                    let revealStep = 0;
+                    let revealInterval = setInterval(() => {
+                        if (revealStep > halfLength) {
+                            clearInterval(revealInterval);
+                            element.innerText = finalText;
+                            return;
+                        }
+                        let revealedText = originalText.map((char, i) => {
+                            if (i < revealStep || i >= length - revealStep) {
+                                return char;
+                            }
+                            return getRandomChar();
+                        }).join('');
+                        element.innerText = revealedText;
+                        revealStep++;
+                    }, revealTime);
+                }, 2000);
+            }
+            glitchText(header, finalText, charTime, revealTime);
+        });
+</script>
+
+<link rel="shortcut icon" href="/res/favicon.png" type="image/png">
 <meta charset="UTF-8">
-<title>Studio Server - ${cleanFolderName}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Server - ${folderName}</title>
 <link rel="stylesheet" href="/res/style-funtio.css">
-</head>
 
-<body>
-<center>
-<div id="api-wrapper">
-<div id="api-container">
-<h1 id="header">${cleanFolderName}</h1>
+   </head>
+   <body>
 
-<p>You can <b>search</b> simply by clicking the <b>Use</b> button.</p>
-<hr>
+      <center>
+         <div id="api-wrapper">
+            <div id="api-container">
+               <a href="/" style="text-decoration: none; color: black;">
+                  <center>
+                     <h1 id="header">${folderName}</h1>
+                  </center>
+               </a>
 
-<div class="table-wrapper">
-<table class="table-api" cellspacing="0">
-<tbody>
-${rows}
-</tbody>
-</table>
-</div>
+               <center><p id="fetching">You can <b>search</b> simply by clicking the <b>Use</b> button.</p></center>
 
-<hr>
-&copy; ${new Date().getFullYear()} Studio Server Developers.
-</div>
-</div>
-</center>
-</body>
+               <hr style="border: 0px; border-top: 1px dashed #222;">
+
+               <div class="table-wrapper">
+                  <table class="table-api">
+                     <tbody>
+                        ${rowsHtml}
+                     </tbody>
+                  </table>
+               </div>
+
+               <div class="texto-inferior">
+                  <hr style="border: 0px; border-top: 1px dashed #222;">
+                  &copy; <span id="year">${new Date().getFullYear()}</span>
+                  <a href="https://developer.studioserver.org/" style="text-decoration: none; color: black;"><b>Studio Server Developers</b></a>
+               </div>
+            </div>
+         </div>
+      </center>
+
+   </body>
 </html>
 `;
-}
 
-// MAIN HANDLER
-export default async function handler(req, res) {
-  try {
-    const url = req.url.split("?")[0];
+        res.setHeader("Content-Type", "text/html");
+        return res.send(html);
 
-    // 1. Ruta / → home.html
-    if (url === "/") {
-      const filePath = path.join(process.cwd(), "public", "home.html");
-      const home = fs.readFileSync(filePath, "utf8");
-      res.setHeader("Content-Type", "text/html");
-      return res.status(200).send(home);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Internal server error");
     }
-
-    // 2. Detecta carpeta y archivo
-    const parts = url.split("/").filter((a) => a);
-
-    const folder = parts[0];
-    const file = parts[1];
-
-    const folderPath = path.join(FOLDERS_PATH, folder);
-
-    // Verificar si la carpeta existe
-    if (!fs.existsSync(folderPath)) {
-      return res.status(404).send("Not found");
-    }
-
-    // Si NO hay archivo → devolver HTML auto generado
-    if (!file) {
-      const allFiles = fs
-        .readdirSync(folderPath)
-        .filter((f) => f.endsWith(".js"));
-
-      const html = generateHTML(folder, allFiles);
-      res.setHeader("Content-Type", "text/html");
-      return res.status(200).send(html);
-    }
-
-    // Ejecutar archivo JS dinámicamente
-    const filePath = path.join(folderPath, `${file}.js`);
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send("API not found");
-    }
-
-    const module = await import(filePath);
-    return module.default(req, res);
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send("Server error");
-  }
 }
