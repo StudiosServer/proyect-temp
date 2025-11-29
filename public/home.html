@@ -1,1 +1,357 @@
-server active yes!
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <link rel="shortcut icon" href="/res/favicon.png" type="image/png">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Studio Server | API</title>
+      <script src="./res/jquery-3.7.1.min2.js"></script>
+      <link rel="canonical" href="/"/>
+
+      <meta property="og:description"  content="Free Rest API for various purposes, apikey no required."/>
+      <meta property="og:image" content="https://i.postimg.cc/RFrcFZFX/apiiimage.jpg"/>
+      <meta property="og:url" content="/"/>
+      <meta name="keywords" content="">
+      <meta name="description" content="Free Rest API for various purposes, apikey no required.">
+      <meta name="author" content="Sareth">
+      <meta name="copyright" content="Copyright &copy; Studio Server All Rights Reserved."/>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+      <link href="res/all.min.css" rel="stylesheet">
+      <link href="./res/bootstrap-icons.css" rel="stylesheet">
+
+      <link rel="stylesheet" href="/res/style-funtio.css">
+
+
+
+      <style>.share-tech-mono-regular,
+         body {
+         font-family: "Share Tech Mono", monospace;
+         }
+         .share-tech-mono-regular {
+         font-weight: 400;
+         font-style: normal;
+         }
+         :root {
+         --bg-color: #fff;
+         --bg-img: url("/res/background.png");
+         --border-color: #fff;
+         }
+         body {
+         margin: 0;
+         padding: 0;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+         background-image: var(--bg-img);
+         background-attachment: fixed;
+         background-color: var(--bg-color);
+         }
+         #api-wrapper {
+         width: 100%;
+         display: flex;
+         justify-content: center;
+         }
+         #api-container {
+         width: 300px;
+         height: 448px;
+         padding: 20px;
+         font-size: 15px;
+         overflow: hidden;
+         overflow-y: auto;
+         border: 1px dashed #222;
+         position: relative;
+         }
+         #api-container::-webkit-scrollbar {
+         width: 0;
+         height: 0;
+         background: 0 0;
+         }
+         #api-container .texto-inferior {
+         position: absolute;
+         bottom: 3px;
+         left: 0;
+         width: 100%;
+         text-align: center;
+         }
+         .table-wrapper {
+         max-height: 280px;
+         overflow-y: auto;
+         }
+         .table-api {
+         width: 100%;
+         border-collapse: collapse;
+         }
+         .table-api td,
+         .table-api th {
+         padding: 10px;
+         vertical-align: middle;
+         text-align: left;
+         }
+         .category-header {
+         font-weight: 700;
+         }
+         .circle {
+         width: 10px;
+         height: 10px;
+         border-radius: 50%;
+         display: inline-block;
+         margin-right: 6px;
+         animation: 1s infinite blink;
+         }
+         .ellipsis {
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         padding-left: 30px !important;
+         }
+         .build-button {
+         padding: 6px 10px;
+         background-color: #eee;
+         color: #000000bd;
+         border: none;
+         border-radius: 6px;
+         cursor: pointer;
+         margin: 0 -10px;
+         transition: background-color 0.3s;
+         }
+         .build-button:hover {
+         color: #fff;
+         background-color: #353535;
+         }
+         @keyframes blink {
+         0%,
+         100% {
+         opacity: 0;
+         }
+         50% {
+         opacity: 1;
+         }
+         }
+         #fetching {
+         white-space: pre-line;
+         margin-bottom: 20px;
+         }
+      </style>
+   </head>
+   <body>
+      <center>
+         <div id="api-wrapper">
+            <div id="api-container">
+               <center>
+                  <h1 id="header">Studio Server</h1>
+               </center>
+               <center>
+                  <p id="fetching">Here are the folders with all available <b>APIS</b> on this website.<br><b>(No Require Token)</b></p>
+               </center>
+               <td colspan="2">
+                  <hr style="border: 0px; border-top: 1px dashed #222;">
+               </td>
+               <div class="table-wrapper">
+                  <table class="table-api" cellspacing="0">
+                     <tbody>
+                        <tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Search</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/search/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Downloads</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/download/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Ia</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/ia/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> AI Image</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/iaimage/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Tools</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/tools/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Canvas</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/canvas/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <!-- <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Nsfw</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/nsfw/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr> -->
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> URL Shorteners</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/shorten/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Anime</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/anime/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                                 <path d="M18 10L13 10" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                                 <path d="M22 11.7979C22 9.16554 22 7.84935 21.2305 6.99383C21.1598 6.91514 21.0849 6.84024 21.0062 6.76946C20.1506 6 18.8345 6 16.2021 6H15.8284C14.6747 6 14.0979 6 13.5604 5.84678C13.2651 5.7626 12.9804 5.64471 12.7121 5.49543C12.2237 5.22367 11.8158 4.81578 11 4L10.4497 3.44975C10.1763 3.17633 10.0396 3.03961 9.89594 2.92051C9.27652 2.40704 8.51665 2.09229 7.71557 2.01738C7.52976 2 7.33642 2 6.94975 2C6.06722 2 5.62595 2 5.25839 2.06935C3.64031 2.37464 2.37464 3.64031 2.06935 5.25839C2 5.62595 2 6.06722 2 6.94975M21.9913 16C21.9554 18.4796 21.7715 19.8853 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V11" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> Random</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/random/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" style="margin-right: 10px;">
+                                 <path d="M19,20.5h-1v-2h1v2Zm3-5.5h2v6.5c0,1.379-1.121,2.5-2.5,2.5h-6c-1.379,0-2.5-1.121-2.5-2.5v-6.5h2v-1.5c0-1.93,1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5v1.5Zm-6,0h5v-1.5c0-1.379-1.121-2.5-2.5-2.5s-2.5,1.121-2.5,2.5v1.5Zm7,1H14v5.5c0,.827,.673,1.5,1.5,1.5h6c.827,0,1.5-.673,1.5-1.5v-5.5Zm-1.5-13H2.5c-1.378,0-2.5,1.121-2.5,2.5v10.5H11v-1H1V5.5c0-.827,.673-1.5,1.5-1.5H21.5c.827,0,1.5,.673,1.5,1.5v5.5h1V5.5c0-1.379-1.121-2.5-2.5-2.5ZM9.954,11.754l1.547-1.547,1.547,1.547,.707-.707-1.547-1.547,1.547-1.547-.707-.707-1.547,1.547-1.547-1.547-.707,.707,1.547,1.547-1.547,1.547,.707,.707Zm-3.009-4.508l-1.547,1.547-1.547-1.547-.707,.707,1.547,1.547-1.547,1.547,.707,.707,1.547-1.547,1.547,1.547,.707-.707-1.547-1.547,1.547-1.547-.707-.707Z"/>
+                               </svg>
+                              
+                              <span style="font-family: 'Share Tech Mono', monospace;"> API Key</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/premium/" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin-right: 10px;" width="20" height="20" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="m21.3 13.88-.45-.26a8.988 8.988 0 0 0 0-3.26l.45-.26A3.014 3.014 0 0 0 22.41 6c-.4-.69-1.05-1.19-1.82-1.4-.77-.21-1.58-.1-2.28.3l-.45.26A8.981 8.981 0 0 0 15 3.51v-.52c0-1.65-1.35-3-3-3s-3 1.35-3 3v.52c-1.05.37-2.02.93-2.86 1.65l-.45-.26c-.69-.4-1.5-.5-2.28-.3-.77.21-1.42.71-1.82 1.4a3.016 3.016 0 0 0 1.1 4.1l.45.26a8.988 8.988 0 0 0 0 3.26l-.45.26a3.014 3.014 0 0 0-1.11 4.1c.4.69 1.05 1.19 1.82 1.4.77.21 1.58.1 2.28-.3l.45-.26c.84.72 1.81 1.28 2.86 1.65v.52c0 1.65 1.35 3 3 3s3-1.35 3-3v-.52c1.05-.37 2.02-.93 2.86-1.65l.45.26c.69.4 1.5.51 2.28.3.77-.21 1.42-.71 1.82-1.4.82-1.43.33-3.27-1.1-4.1Zm-2.56-3.74c.17.62.26 1.25.26 1.86s-.09 1.23-.26 1.86c-.12.44.07.9.47 1.13l1.09.63c.48.28.64.89.37 1.37-.13.23-.35.4-.61.47-.26.07-.53.04-.76-.1l-1.09-.63a.986.986 0 0 0-1.21.17c-.89.91-2.01 1.56-3.25 1.88-.44.11-.75.51-.75.97v1.26c0 .55-.45 1-1 1s-1-.45-1-1v-1.26c0-.46-.31-.85-.75-.97A6.979 6.979 0 0 1 7 16.9c-.19-.2-.45-.3-.72-.3-.17 0-.34.04-.5.13l-1.09.63c-.23.13-.5.17-.76.1s-.47-.24-.61-.47a1.01 1.01 0 0 1 .37-1.37l1.09-.63c.4-.23.59-.69.47-1.13-.17-.62-.26-1.25-.26-1.86s.09-1.23.26-1.86c.12-.44-.07-.9-.47-1.13l-1.09-.63a1.01 1.01 0 0 1-.37-1.37.998.998 0 0 1 1.37-.37l1.09.63c.4.23.89.16 1.21-.17.89-.91 2.01-1.56 3.25-1.88.44-.11.75-.51.75-.97V2.99c0-.55.45-1 1-1s1 .45 1 1v1.26c0 .46.31.85.75.97 1.24.32 2.36.97 3.25 1.88.32.33.82.4 1.21.17l1.09-.63c.23-.13.5-.17.76-.1s.47.24.61.47c.27.48.11 1.09-.37 1.37l-1.09.63c-.4.23-.59.69-.47 1.13ZM13.78 8.2l-1.6 8c-.09.48-.51.8-.98.8-.06 0-.13 0-.2-.02a.997.997 0 0 1-.78-1.18l1.6-8c.11-.54.63-.89 1.18-.78.54.11.89.63.78 1.18Zm-4.57 2.65L8 12.06l1.21 1.19a.996.996 0 0 1-.71 1.7c-.26 0-.51-.1-.71-.29l-1.21-1.21a1.98 1.98 0 0 1 0-2.81l1.21-1.21a.996.996 0 1 1 1.41 1.41Zm8.21-.2c.78.78.78 2.04 0 2.81l-1.21 1.21c-.2.2-.45.29-.71.29s-.51-.1-.71-.29a.996.996 0 0 1 0-1.41L16 12.05l-1.21-1.2a.996.996 0 1 1 1.41-1.41l1.21 1.21Z" fill="#565656" opacity="1" data-original="#000000" class="">
+                              </path>
+                           </g>
+                        </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;"> System</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/information" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="display: flex; align-items: center;">
+                              <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="20" height="20" style="margin-right: 10px;">
+                                 <path d="M17,13h-6v-1h6v1Zm0-5h-6v1h6v-1Zm0,8h-6v1h6v-1ZM9,8h-2v1h2v-1Zm0,4h-2v1h2v-1Zm0,4h-2v1h2v-1Zm12,5.5V2h-5.05c-.232-1.14-1.242-2-2.45-2h-3c-1.208,0-2.217,.86-2.45,2H3V21.5c0,1.379,1.122,2.5,2.5,2.5h13c1.378,0,2.5-1.121,2.5-2.5ZM9,3v-.5c0-.827,.673-1.5,1.5-1.5h3c.827,0,1.5,.673,1.5,1.5v.5h5V21.5c0,.827-.673,1.5-1.5,1.5H5.5c-.827,0-1.5-.673-1.5-1.5V3h5Z"/>
+                              </svg>
+                              <span style="font-family: 'Share Tech Mono', monospace;">Change log</span>
+                           </td>
+                           <td align="center" style="vertical-align: middle;">
+                              <a href="/logs" style="text-decoration: none;">
+                              <button class="build-button">Open</button>
+                              </a>
+                           </td>
+                        </tr>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+               <div class="texto-inferior">
+                  <td colspan="2">
+                     <hr style="border: 0px; border-top: 1px dashed #222;">
+                  </td>
+                  &copy;<span id="year">0000</span> <a href="https://developer.studioserver.org/" style="text-decoration: none; color: black;"><b>Studio Server Developers</b></a>
+               </div>
+            </div>
+         </div>
+      </center>
+      
+            <script>
+               var year = document.getElementById("year");
+               var date = new Date().getFullYear();
+               year.textContent = date;
+            </script>
+   </body>
+</html>
