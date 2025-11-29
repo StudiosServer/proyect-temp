@@ -1,155 +1,119 @@
-// /api/anime/index.js   (100% compatible con Vercel)
-
 import fs from "fs";
 import path from "path";
 
-export default async function handler(req, res) {
+const FOLDERS_PATH = path.join(process.cwd(), "folders");
 
-    const folderName = "anime";
+// Genera el HTML dinámico
+function generateHTML(folderName, files) {
+  const cleanFolderName =
+    folderName.charAt(0).toUpperCase() + folderName.slice(1);
 
-    // Ruta real en Vercel
-    const folderPath = path.join(process.cwd(), "api", folderName);
+  let rows = "";
 
-    // Obtener archivos JS dentro de la carpeta
-    const files = fs
-        .readdirSync(folderPath)
-        .filter(f => f.endsWith(".js") && f !== "index.js");
+  files.forEach((file) => {
+    const cleanName = file.replace(".js", "");
+    const displayName =
+      cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 
-    // Generar filas de la tabla
-    let rows = "";
-
-    for (const file of files) {
-        const name = path.parse(file).name;
-        const displayName = name.charAt(0).toUpperCase() + name.slice(1);
-        const route = `/api/${folderName}/${name}`;
-
-        rows += `
+    rows += `
         <tr class="button-false">
-            <td class="ellipsis">
-                <tt><span class="circle color-true"></span>${displayName}</tt>
-            </td>
-            <td align="center">
-                <a href="${route}">
-                    <button class="build-button">Use</button>
-                </a>
-            </td>
-        </tr>`;
-    }
+          <td class="ellipsis">
+            <tt><span class="circle color-true"></span>${displayName}</tt>
+          </td>
+          <td align="center">
+            <a href="/${folderName}/${cleanName}">
+              <button class="build-button">Use</button>
+            </a>
+          </td>
+        </tr>
+    `;
+  });
 
-    // HTML COMPLETO (Tu plantilla exacta)
-    const html = `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Studio Server - ${folderName}</title>
-<link rel="shortcut icon" href="/res/favicon.png" type="image/png">
-
-<style>
-${readCss()}
-</style>
-
-<script>
-${glitchScript(folderName)}
-</script>
-
+<title>Studio Server - ${cleanFolderName}</title>
+<link rel="stylesheet" href="/res/style-funtio.css">
 </head>
 
 <body>
 <center>
 <div id="api-wrapper">
 <div id="api-container">
+<h1 id="header">${cleanFolderName}</h1>
 
-<a href="/" style="text-decoration:none;color:black;">
-<center><h1 id="header">${folderName}</h1></center>
-</a>
-
-<center><p id="fetching">You can <b>search</b> simply by clicking the <b>Use</b> button.</p></center>
-
-<hr style="border: 0px; border-top: 1px dashed #222;">
+<p>You can <b>search</b> simply by clicking the <b>Use</b> button.</p>
+<hr>
 
 <div class="table-wrapper">
-<table class="table-api">
+<table class="table-api" cellspacing="0">
 <tbody>
 ${rows}
 </tbody>
 </table>
 </div>
 
-<div class="texto-inferior">
-<hr style="border: 0px; border-top: 1px dashed #222;">
-&copy; <span id="year"></span> <b>Studio Server Developers</b>
-</div>
-
+<hr>
+&copy; ${new Date().getFullYear()} Studio Server Developers.
 </div>
 </div>
 </center>
-
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
 </body>
 </html>
 `;
-
-    res.setHeader("Content-Type", "text/html");
-    res.status(200).send(html);
 }
 
-// ========================
-// FUNCIONES DE APOYO
-// ========================
+// MAIN HANDLER
+export default async function handler(req, res) {
+  try {
+    const url = req.url.split("?")[0];
 
-// Lee tu CSS desde /public/res/style-funtio.css
-function readCss() {
-    try {
-        return fs.readFileSync(path.join(process.cwd(), "public", "res", "style-funtio.css"), "utf8");
-    } catch {
-        return "body { font-family: monospace; }";
-    }
-}
-
-function glitchScript(text) {
-    return `
-document.addEventListener('DOMContentLoaded', function() {
-    const header = document.getElementById('header');
-    const chars = "!@#<>$%^&*()-_=+[]{}|;:,.<>?\\~";
-    const finalText = "${text}";
-    const charTime = 50;
-    const revealTime = 50;
-    let glitching = true;
-    const originalText = finalText.split('');
-    const length = originalText.length;
-    const halfLength = Math.ceil(length / 2);
-
-    function getRandomChar() {
-        return chars[Math.floor(Math.random() * chars.length)];
+    // 1. Ruta / → home.html
+    if (url === "/") {
+      const filePath = path.join(process.cwd(), "public", "home.html");
+      const home = fs.readFileSync(filePath, "utf8");
+      res.setHeader("Content-Type", "text/html");
+      return res.status(200).send(home);
     }
 
-    let glitchInterval = setInterval(() => {
-        header.innerText = originalText.map(char =>
-            glitching && Math.random() > 0.5 ? getRandomChar() : char
-        ).join('');
-    }, charTime);
+    // 2. Detecta carpeta y archivo
+    const parts = url.split("/").filter((a) => a);
 
-    setTimeout(() => {
-        clearInterval(glitchInterval);
-        glitching = false;
-        let step = 0;
-        let revealInterval = setInterval(() => {
-            if (step > halfLength) {
-                clearInterval(revealInterval);
-                header.innerText = finalText;
-                return;
-            }
-            header.innerText = originalText.map((char, i) => {
-                if (i < step || i >= length - step) return char;
-                return getRandomChar();
-            }).join('');
-            step++;
-        }, revealTime);
-    }, 2000);
-});
-`;
+    const folder = parts[0];
+    const file = parts[1];
+
+    const folderPath = path.join(FOLDERS_PATH, folder);
+
+    // Verificar si la carpeta existe
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).send("Not found");
+    }
+
+    // Si NO hay archivo → devolver HTML auto generado
+    if (!file) {
+      const allFiles = fs
+        .readdirSync(folderPath)
+        .filter((f) => f.endsWith(".js"));
+
+      const html = generateHTML(folder, allFiles);
+      res.setHeader("Content-Type", "text/html");
+      return res.status(200).send(html);
+    }
+
+    // Ejecutar archivo JS dinámicamente
+    const filePath = path.join(folderPath, `${file}.js`);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("API not found");
+    }
+
+    const module = await import(filePath);
+    return module.default(req, res);
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Server error");
+  }
 }
