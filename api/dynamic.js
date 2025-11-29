@@ -1,54 +1,144 @@
+// dynamic.js — Generador automático de páginas HTML
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export default function setupDynamicPages(app, baseDir) {
 
-// Ruta absoluta a /folders
-const foldersPath = path.join(__dirname, "..", "folders");
+    // Ruta principal dinámica ejemplo: /anime
+    app.get("/:folder", (req, res, next) => {
+        const folderName = req.params.folder;
+        const folderPath = path.join(baseDir, folderName);
 
-// Cargar dinámicamente todos los módulos
-function loadHandlers() {
-  const handlers = {};
+        // Si NO existe, seguir con los siguientes middlewares
+        if (!fs.existsSync(folderPath)) return next();
 
-  const folders = fs.readdirSync(foldersPath);
+        // Leer archivos .js del directorio
+        const files = fs.readdirSync(folderPath)
+            .filter(f => f.endsWith(".js"));
 
-  for (const folder of folders) {
-    const fullFolder = path.join(foldersPath, folder);
+        // Construir filas de la tabla dinámicamente
+        let rows = "";
 
-    if (fs.statSync(fullFolder).isDirectory()) {
-      const files = fs.readdirSync(fullFolder);
+        for (const file of files) {
+            const name = path.parse(file).name; // sin .js  
+            const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+            const route = `./${name}`;
 
-      for (const file of files) {
-        if (file.endsWith(".js")) {
-          const routeName = file.replace(".js", ""); // ej: apiphotos
-          const routePath = `/${folder}/${routeName}`; // ej: /fotos/apiphotos
-
-          const modulePath = path.join(fullFolder, file);
-
-          handlers[routePath] = import(modulePath);
+            rows += `
+            <tr class="button-false">
+                <td class="ellipsis">
+                    <tt><span class="circle color-true"></span>${displayName}</tt>
+                </td>
+                <td align="center">
+                    <a href="${route}">
+                        <button class="build-button">Use</button>
+                    </a>
+                </td>
+            </tr>`;
         }
-      }
-    }
-  }
 
-  return handlers;
-}
+        // Construir el HTML completo
+        const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Studio Server - ${folderName}</title>
+<link rel="shortcut icon" href="/res/favicon.png" type="image/png">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.getElementById('header');
+        const chars = "!@#<>$%^&*()-_=+[]{}|;:,.<>?\\~";
+        const finalText = "${folderName}";
+        const charTime = 50;
+        const revealTime = 50;
+        let glitching = true;
+        const originalText = finalText.split('');
+        const length = originalText.length;
+        const halfLength = Math.ceil(length / 2);
 
-export default async function handler(req, res) {
-  const handlers = loadHandlers();  // Se carga en cada request (compatible Vercel)
-  const url = req.url;
+        function getRandomChar() {
+            return chars[Math.floor(Math.random() * chars.length)];
+        }
 
-  if (handlers[url]) {
-    const mod = await handlers[url];
+        function glitchText(element) {
+            let glitchInterval = setInterval(() => {
+                let newText = originalText.map(char =>
+                    glitching && Math.random() > 0.5 ? getRandomChar() : char
+                ).join('');
+                element.innerText = newText;
+            }, charTime);
 
-    if (mod.default) return mod.default(req, res);
+            setTimeout(() => {
+                clearInterval(glitchInterval);
+                glitching = false;
+                let revealStep = 0;
+                let revealInterval = setInterval(() => {
+                    if (revealStep > halfLength) {
+                        clearInterval(revealInterval);
+                        element.innerText = finalText;
+                        return;
+                    }
+                    let revealedText = originalText.map((char, i) => {
+                        if (i < revealStep || i >= length - revealStep) return char;
+                        return getRandomChar();
+                    }).join('');
+                    header.innerText = revealedText;
+                    revealStep++;
+                }, revealTime);
+            }, 2000);
+        }
 
-    res.statusCode = 500;
-    return res.end("El módulo no tiene export default");
-  }
+        glitchText(header);
+    });
+</script>
 
-  res.statusCode = 404;
-  res.end("Ruta dinámica no encontrada");
+<link rel="stylesheet" href="/res/style-funtio.css">
+
+<style>
+/* (Aquí va todo tu CSS EXACTO) */
+${fs.readFileSync("./html-style.css", "utf8") || ""}
+</style>
+
+</head>
+<body>
+<center>
+<div id="api-wrapper">
+<div id="api-container">
+
+<a href="/" style="text-decoration:none;color:black;">
+<center><h1 id="header">${folderName}</h1></center>
+</a>
+
+<center><p id="fetching">You can <b>search</b> simply by clicking the <b>Use</b> button.</p></center>
+
+<hr style="border: 0px; border-top: 1px dashed #222;">
+
+<div class="table-wrapper">
+<table class="table-api">
+<tbody>
+
+${rows}
+
+</tbody>
+</table>
+</div>
+
+<div class="texto-inferior">
+<hr style="border: 0px; border-top: 1px dashed #222;">
+&copy; <span id="year"></span> <a href="https://developer.studioserver.org/" style="text-decoration:none;color:black;"><b>Studio Server Developers</b></a>
+</div>
+
+</div>
+</div>
+</center>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
+`;
+
+        res.send(html);
+    });
 }
