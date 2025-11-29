@@ -1,10 +1,4 @@
 import axios from "axios";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -13,44 +7,30 @@ export default async function handler(req, res) {
   }
 
   try {
-    // URL de la imagen que deseas descargar
     const imageUrl = "https://www.loliapi.com/acg/pp/";
 
-    // Descargar la imagen en binario
+    // Descargar la imagen en binario SIN GUARDAR
     const response = await axios.get(imageUrl, {
       responseType: "arraybuffer",
     });
 
-    // Guardar la imagen temporalmente
-    const tempDir = path.join(__dirname, "tempdata");
-    const imagePath = path.join(tempDir, "avatar.webp");
+    // Copiar el tipo de imagen del servidor externo
+    const contentType = response.headers["content-type"] || "image/webp";
+    res.setHeader("Content-Type", contentType);
 
-    // Crear directorio si no existe
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
-
-    fs.writeFileSync(imagePath, response.data);
-
-    // Enviar archivo como respuesta
-    res.setHeader("Content-Type", "image/webp");
+    // Enviar la imagen directamente al cliente
     res.statusCode = 200;
-    res.sendFile(imagePath, (err) => {
-      if (err) {
-        console.error("Error enviando archivo:", err);
-        res.statusCode = 500;
-        res.end("Error enviando imagen");
-      }
-    });
+    res.end(response.data);
 
-    // Ejecución secundaria en segundo plano (no bloquea)
+    // Llamada secundaria en segundo plano (no bloquea)
     setImmediate(() => {
-      const trackingURL = `https://studioservercounterapimax.onrender.com/use`;
-      axios.get(trackingURL).catch(() => { });
+      axios
+        .get("https://studioservercounterapimax.onrender.com/use")
+        .catch(() => {});
     });
 
   } catch (error) {
-    console.error("Error en avatar.js:", error);
+    console.error("avatar.js ERROR:", error);
     res.statusCode = 500;
     res.end(JSON.stringify({ status: false }));
   }
